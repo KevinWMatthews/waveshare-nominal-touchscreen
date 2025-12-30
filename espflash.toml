@@ -1,3 +1,5 @@
 [flash]
+# Flash size for Waveshare ESP32-S3-Touch-LCD-2.8C dev kit
+size = "16MB"
 # Flash size for ESP32-S3-WROOM-1 dev kit
-size = "8MB"
+# size = "8MB"

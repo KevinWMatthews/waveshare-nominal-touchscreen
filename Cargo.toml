@@ -7,12 +7,18 @@ edition = "2024"
 esp-idf-sys = "0.36.1"
 
 [[package.metadata.esp-idf-sys.extra_components]]
-component_dirs = [
-    "src/components/Buzzer",
-    "src/components/EXIO",
-    "src/components/I2C_Driver",
-    "src/components/TCA9554PWR",
-]
+component_dirs = ["src/components/Buzzer"]
+
+[[package.metadata.esp-idf-sys.extra_components]]
+component_dirs = ["src/components/EXIO"]
+bindings_header = "src/components/EXIO/EXIO.h"
+
+[[package.metadata.esp-idf-sys.extra_components]]
+component_dirs = ["src/components/I2C_Driver"]
+bindings_header = "src/components/I2C_Driver/I2C_Driver.h"
+
+[[package.metadata.esp-idf-sys.extra_components]]
+component_dirs = ["src/components/TCA9554PWR"]
 
 [build-dependencies]
 embuild = {version = "0.33.1", features = ["espidf"]}
