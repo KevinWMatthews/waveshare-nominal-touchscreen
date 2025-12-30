@@ -24,5 +24,9 @@ bindings_header = "src/components/I2C_Driver/I2C_Driver.h"
 [[package.metadata.esp-idf-sys.extra_components]]
 component_dirs = ["src/components/TCA9554PWR"]
 
+[[package.metadata.esp-idf-sys.extra_components]]
+component_dirs = ["src/components/Touch_Driver"]
+bindings_header = "src/components/Touch_Driver/GT911.h"
+
 [build-dependencies]
 embuild = {version = "0.33.1", features = ["espidf"]}
