@@ -14,6 +14,10 @@ component_dirs = ["src/components/EXIO"]
 bindings_header = "src/components/EXIO/EXIO.h"
 
 [[package.metadata.esp-idf-sys.extra_components]]
+component_dirs = ["src/components/LCD_Driver"]
+bindings_header = "src/components/LCD_Driver/ST7701S.h"
+
+[[package.metadata.esp-idf-sys.extra_components]]
 component_dirs = ["src/components/I2C_Driver"]
 bindings_header = "src/components/I2C_Driver/I2C_Driver.h"
 
