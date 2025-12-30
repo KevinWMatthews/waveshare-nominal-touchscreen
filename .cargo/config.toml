@@ -1,6 +1,10 @@
 [build]
 target = "xtensa-esp32s3-espidf"
 
+[env]
+ESP_IDF_VERSION = "tag:v5.3.4"
+# ESP_IDF_SDKCONFIG_DEFAULTS = ""
+
 [target.'cfg(target_arch = "xtensa")']
 linker = "ldproxy"
 runner = "espflash flash --monitor"
