@@ -417,7 +417,7 @@ static bool example_on_vsync_event(esp_lcd_panel_handle_t panel, const esp_lcd_r
 }
 
 esp_lcd_panel_handle_t panel_handle = NULL;
-void LCD_Init(void)
+void LCD_Init(void *user_data)
 {
     /********************* LCD *********************/
     ST7701S_reset();
@@ -487,7 +487,7 @@ void LCD_Init(void)
     esp_lcd_rgb_panel_event_callbacks_t cbs = {
         .on_vsync = example_on_vsync_event,
     };
-    ESP_ERROR_CHECK(esp_lcd_rgb_panel_register_event_callbacks(panel_handle, &cbs, &disp_drv));
+    ESP_ERROR_CHECK(esp_lcd_rgb_panel_register_event_callbacks(panel_handle, &cbs, user_data));
 
     ESP_LOGI(LCD_TAG, "Initialize RGB LCD panel");
     ESP_ERROR_CHECK(esp_lcd_panel_reset(panel_handle));

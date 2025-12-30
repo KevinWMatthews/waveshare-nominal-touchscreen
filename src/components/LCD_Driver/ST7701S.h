@@ -10,7 +10,6 @@
 #include "driver/ledc.h"
 
 #include "TCA9554PWR.h"
-#include "LVGL_Driver.h"
 
 #define SPI_METHOD 1
 #define IOEXPANDER_METHOD 0
@@ -99,7 +98,13 @@ esp_err_t ST7701S_reset(void);// LCD Reset
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void LCD_Init(void);
+/**
+ * Initialize the LCD
+ *
+ * user_data: Handle to user data for RGB LCD callback events.
+ * The caller must ensure that the data remains valid for the lifetime of the LCD panel.
+ */
+void LCD_Init(void *user_data);
 
 /********************* BackLight *********************/
 void Backlight_Init(void);
