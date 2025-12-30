@@ -1,9 +1,9 @@
 idf_component_register(
     SRCS
-        "EXIO.c"
+        "Buzzer.c"
 
     INCLUDE_DIRS
          "."
 
-     REQUIRES Buzzer TCA9554PWR
+     REQUIRES TCA9554PWR
 )
