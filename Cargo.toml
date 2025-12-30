@@ -7,7 +7,10 @@ edition = "2024"
 esp-idf-sys = "0.36.1"
 
 [[package.metadata.esp-idf-sys.extra_components]]
-component_dirs = ["src/components/I2C_Driver"]
+component_dirs = [
+    "src/components/EXIO",
+    "src/components/I2C_Driver",
+]
 
 [build-dependencies]
 embuild = {version = "0.33.1", features = ["espidf"]}
