@@ -22,6 +22,10 @@ component_dirs = ["src/components/I2C_Driver"]
 bindings_header = "src/components/I2C_Driver/I2C_Driver.h"
 
 [[package.metadata.esp-idf-sys.extra_components]]
+component_dirs = ["src/components/QMI8658"]
+bindings_header = "src/components/QMI8658/QMI8658.h"
+
+[[package.metadata.esp-idf-sys.extra_components]]
 component_dirs = ["src/components/TCA9554PWR"]
 
 [[package.metadata.esp-idf-sys.extra_components]]
