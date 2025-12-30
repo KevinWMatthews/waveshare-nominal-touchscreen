@@ -1,4 +1,4 @@
-menu "Example Configuration"
+menu "LCD Driver Configuration"
     config EXAMPLE_DOUBLE_FB
         bool "Use double Frame Buffer"
         default n
