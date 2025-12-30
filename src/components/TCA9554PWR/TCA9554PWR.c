@@ -86,10 +86,3 @@ void TCA9554PWR_Init(uint8_t PinState)                  // Set the seven pins to
     // i2c_master_init();                                                  
     Mode_EXIOS(PinState);                                          
 }
-
-esp_err_t EXIO_Init(void)
-{
-    TCA9554PWR_Init(0x00);
-    Buzzer_Off();
-    return ESP_OK;
-}

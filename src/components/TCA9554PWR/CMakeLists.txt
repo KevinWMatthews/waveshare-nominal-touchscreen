@@ -1,9 +1,9 @@
 idf_component_register(
     SRCS
-        "EXIO.c"
+        "TCA9554PWR.c"
 
     INCLUDE_DIRS
          "."
 
-     REQUIRES TCA9554PWR
+     REQUIRES driver
 )

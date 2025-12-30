@@ -1,3 +1,3 @@
 # `EXIO`
 
-Waveshare's driver library for TI's `TCA9554PWR` GPIO expander.
+An "external I/O" library, connecting the Waveshare board's external I/O driver chip (TCA9554PWR) with peripherals.

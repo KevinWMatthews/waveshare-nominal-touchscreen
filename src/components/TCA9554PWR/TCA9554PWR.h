@@ -4,8 +4,6 @@
 #include <stdio.h>
 #include "driver/i2c.h"
 
-#include "Buzzer.h"
-
 #define TCA9554_EXIO1 0x01
 #define TCA9554_EXIO2 0x02
 #define TCA9554_EXIO3 0x03
@@ -48,5 +46,3 @@ void Set_EXIOS(uint8_t PinState);                           // Set 7 pins to the
 void Set_Toggle(uint8_t Pin);                               // Flip the level of the TCA9554PWR Pin
 /********************************************************* TCA9554PWR Initializes the device ***********************************************************/  
 void TCA9554PWR_Init(uint8_t PinState);                     // Set the seven pins to PinState state, for example :PinState=0x23, 0010 0011 State (the highest bit is not used) (Output mode or input mode) 0= Output mode 1= Input mode. The default value is output mode
-
-esp_err_t EXIO_Init(void);

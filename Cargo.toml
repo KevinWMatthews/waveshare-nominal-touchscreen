@@ -10,6 +10,7 @@ esp-idf-sys = "0.36.1"
 component_dirs = [
     "src/components/EXIO",
     "src/components/I2C_Driver",
+    "src/components/TCA9554PWR",
 ]
 
 [build-dependencies]
