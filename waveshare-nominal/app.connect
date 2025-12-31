@@ -1,0 +1,60 @@
+title: Waveshare Touchscreen
+
+python:
+  packages:
+    - pyserial
+
+streaming:
+  buffer_size: 5000
+
+bottom_panel:
+  layout:
+    - controls: script_table
+      scripts:
+        - label: Data
+          path: stream_console_data.py
+
+left_panel:
+  width: 1.0
+  tabs:
+    - name: Line Chart
+      layout:
+        - title: Touchscreen
+          stream_id: touch
+          plot: line
+          x_label: Time
+          x_format: timestamp
+          y_label: Pixels
+          y_bounds:
+            min: 0
+            max: 500
+          show_legend: true
+          legend_placement: bottom_right
+        - title: X Coord
+          display: stream_value
+          stream_id: touch
+          channel: x_coord
+          color: rgb(0,0,255)
+        - title: Y Coord
+          display: stream_value
+          stream_id: touch
+          channel: y_coord
+          color: rgb(0,255,0)
+    - name: Scatter Chart
+      layout:
+        - title: Touchscreen
+          stream_id: touch
+          plot: scatter
+          x_channel: x_coord
+          y_channel: y_coord
+          x_label: X Axis
+          y_label: Y Axis
+          x_bounds:
+            min: 0
+            max: 500
+          y_bounds:
+            min: 0
+            max: 500
+          show_legend: true
+          legend_placement: bottom_right
+          height: 600.0
