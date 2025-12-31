@@ -1,5 +1,5 @@
 [package]
-name = "touchscreen_demo_rs"
+name = "waveshare-touchscreen"
 version = "0.1.0"
 edition = "2024"
 
@@ -40,4 +40,4 @@ component_dirs = ["src/components/Touch_Driver"]
 bindings_header = "src/components/Touch_Driver/GT911.h"
 
 [build-dependencies]
-embuild = {version = "0.33.1", features = ["espidf"]}
+embuild = { version = "0.33.1", features = ["espidf"] }
