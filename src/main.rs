@@ -13,7 +13,7 @@ use std::ffi::CString;
 use std::ptr;
 
 fn main() {
-    println!("Hello, world!");
+    println!("Starting main application");
     unsafe { I2C_Init() };
     unsafe { QMI8658_Init() };
     unsafe { EXIO_Init() };
@@ -34,6 +34,7 @@ fn main() {
         )
     };
 
+    println!("Starting LVGL loop");
     loop {
         // raise the task priority of LVGL and/or reduce the handler period can improve the performance
         unsafe { vTaskDelay(ms_to_ticks(10)) };
