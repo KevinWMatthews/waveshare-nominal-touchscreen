@@ -1,3 +1,6 @@
+use std::ffi::CString;
+use std::ptr;
+
 use esp_idf_svc::log::EspLogger;
 use esp_idf_sys as _;
 use esp_idf_sys::EXIO_Init;
@@ -17,8 +20,6 @@ use esp_idf_sys::xTaskCreatePinnedToCore;
 use log::debug;
 use log::info;
 use log::warn;
-use std::ffi::CString;
-use std::ptr;
 
 const NOMINAL_LOG_TAG: &'static str = "NOMINAL";
 
