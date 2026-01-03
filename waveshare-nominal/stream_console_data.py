@@ -69,8 +69,15 @@ def stream_console_data(client: connect_python.Client):
     try:
         with serial.Serial(port=port, baudrate=115200) as serial_device:
             while True:
-                line = serial_device.readline()
-                line = line.decode('utf-8').strip()
+                line: bytes = serial_device.readline()
+                try:
+                    line: str = line.decode('utf-8').strip()
+                except UnicodeDecodeError:
+                    # There can be garbage on the console when reflashing.
+                    # Silently ignore it, as the console connection is still active
+                    logger.debug('Ignoring non-unicode data')
+                    continue
+
                 logger.debug(line)
                 reading: Optional[TouchscreenReading] = TouchscreenReading.parse(line)
                 if not reading:
