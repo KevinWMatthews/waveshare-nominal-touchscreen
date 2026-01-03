@@ -1,20 +1,49 @@
 title: Waveshare Touchscreen
 
+on_load:
+  id: on_load
+  path: scan_serial_devices.py
+
 python:
   packages:
     - pyserial
 
-streaming:
-  buffer_size: 5000
-
-bottom_panel:
-  layout:
-    - controls: script_table
-      scripts:
-        - label: Data
-          path: stream_console_data.py
-
 left_panel:
+  width: 0.5
+  layout:
+    - label: Scan
+      collapsible: true
+      default_open: true
+      group_layout:
+        - label: "Scan for Serial Devices"
+          text: "Scan"
+          show_sigil: false
+          on_click:
+            id: scan
+            path: scan_serial_devices.py
+    - label: Select
+      collapsible: true
+      default_open: true
+      group_layout:
+        - label: "Select a Serial Device"
+          id: serial_device
+          input: dropdown
+          options: [ ]
+          default: ""
+    - label: Stream
+      collapsible: true
+      default_open: true
+      group_layout:
+        - label: Connect a Serial Device
+          text: "Stream"
+          show_sigil: true
+          on_click:
+            id: connect
+            path: stream_console_data.py
+        - display: logs
+          script_id: connect
+
+right_panel:
   width: 1.0
   tabs:
     - name: Line Chart

@@ -42,22 +42,23 @@ class TouchscreenReading:
 
 @connect_python.main
 def stream_console_data(client: connect_python.Client):
-    # port = '/dev/tty.usbmodem5AB01637261'
-    port = '/dev/tty.usbserial-BG01UUCE'
-    # port = '/dev/tty.usbmodem1101'
-    # port = '/dev/tty.usbmodem101'
-    logger.info(f'Streaming data from device at: {port}')
+    port = client.get_value('serial_device')
+    if not port:
+        logger.error('No serial device selected')
+        raise Exception('No serial device selected')
+    logger.info(f'Streaming from serial device: {port}')
 
     start_time = datetime.now(timezone.utc)
     with serial.Serial(port=port, baudrate=115200) as serial_device:
         while True:
             line = serial_device.readline()
             line = line.decode('utf-8').strip()
+            logger.debug(line)
             reading: Optional[TouchscreenReading] = TouchscreenReading.parse(line)
             if not reading:
                 logger.debug('Ignored reading')
                 continue
-            logger.debug(reading)
+            logger.info(reading)
 
             client.stream(
                 "touch", reading.timestamp, reading.x, name="x_coord", start_time=start_time
