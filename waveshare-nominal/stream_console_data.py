@@ -49,23 +49,27 @@ def stream_console_data(client: connect_python.Client):
     logger.info(f'Streaming from serial device: {port}')
 
     start_time = datetime.now(timezone.utc)
-    with serial.Serial(port=port, baudrate=115200) as serial_device:
-        while True:
-            line = serial_device.readline()
-            line = line.decode('utf-8').strip()
-            logger.debug(line)
-            reading: Optional[TouchscreenReading] = TouchscreenReading.parse(line)
-            if not reading:
-                logger.debug('Ignored reading')
-                continue
-            logger.info(reading)
+    try:
+        with serial.Serial(port=port, baudrate=115200) as serial_device:
+            while True:
+                line = serial_device.readline()
+                line = line.decode('utf-8').strip()
+                logger.debug(line)
+                reading: Optional[TouchscreenReading] = TouchscreenReading.parse(line)
+                if not reading:
+                    logger.debug('Ignored reading')
+                    continue
+                logger.info(reading)
 
-            client.stream(
-                "touch", reading.timestamp, reading.x, name="x_coord", start_time=start_time
-            )
-            client.stream(
-                "touch", reading.timestamp, reading.y, name="y_coord", start_time=start_time
-            )
+                client.stream(
+                    "touch", reading.timestamp, reading.x, name="x_coord", start_time=start_time
+                )
+                client.stream(
+                    "touch", reading.timestamp, reading.y, name="y_coord", start_time=start_time
+                )
+    except serial.serialutil.SerialException as e:
+        # Inform the user if the serial connection can't be formed or fails
+        logger.error(f'Serial device error: {e}')
 
 
 if __name__ == "__main__":
