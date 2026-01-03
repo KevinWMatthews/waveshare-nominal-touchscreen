@@ -6,6 +6,10 @@ use esp_idf_sys::LVGL_Init;
 use esp_idf_sys::QMI8658_Init;
 use esp_idf_sys::QMI8658_Loop;
 use esp_idf_sys::Touch_Init;
+use esp_idf_sys::lv_indev_state_t;
+use esp_idf_sys::lv_indev_state_t_LV_INDEV_STATE_PRESSED;
+use esp_idf_sys::lv_indev_state_t_LV_INDEV_STATE_RELEASED;
+use esp_idf_sys::lv_point_t;
 use esp_idf_sys::lv_timer_handler;
 use esp_idf_sys::vTaskDelay;
 use esp_idf_sys::xTaskCreatePinnedToCore;
@@ -19,7 +23,7 @@ fn main() {
     unsafe { EXIO_Init() };
     unsafe { LCD_Init(ptr::null_mut()) };
     unsafe { Touch_Init() };
-    unsafe { LVGL_Init() };
+    unsafe { LVGL_Init(Some(touch_event_callback)) };
 
     let task_name = CString::new("Driver task");
     unsafe {
@@ -59,4 +63,19 @@ extern "C" fn driver_task(_arg: *mut std::ffi::c_void) {
 fn ms_to_ticks(time_in_ms: u32) -> u32 {
     // TODO Be wary of overflow
     (time_in_ms * esp_idf_sys::configTICK_RATE_HZ) / 1000
+}
+
+extern "C" fn touch_event_callback(state: lv_indev_state_t, point: lv_point_t) {
+    #[allow(non_upper_case_globals)]
+    match state {
+        lv_indev_state_t_LV_INDEV_STATE_RELEASED => {
+            println!("Release");
+        }
+        lv_indev_state_t_LV_INDEV_STATE_PRESSED => {
+            println!("Touch: X={} Y={}", point.x, point.y);
+        }
+        val => {
+            println!("Unexpected touch event state: {val}");
+        }
+    }
 }

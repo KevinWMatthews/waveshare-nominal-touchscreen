@@ -19,4 +19,5 @@ void example_increase_lvgl_tick(void *arg);
 /*Read the touchpad*/
 void example_touchpad_read( lv_indev_drv_t * drv, lv_indev_data_t * data );
 
-void LVGL_Init(void);
+typedef void (*lvgl_touch_event_cb)(lv_indev_state_t state, lv_point_t point);
+void LVGL_Init(lvgl_touch_event_cb touch_event_cb);
