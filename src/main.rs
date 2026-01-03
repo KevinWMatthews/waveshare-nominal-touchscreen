@@ -1,3 +1,4 @@
+use esp_idf_svc::log::EspLogger;
 use esp_idf_sys as _;
 use esp_idf_sys::EXIO_Init;
 use esp_idf_sys::I2C_Init;
@@ -13,13 +14,19 @@ use esp_idf_sys::lv_point_t;
 use esp_idf_sys::lv_timer_handler;
 use esp_idf_sys::vTaskDelay;
 use esp_idf_sys::xTaskCreatePinnedToCore;
+use log::debug;
+use log::info;
+use log::warn;
 use std::ffi::CString;
 use std::ptr;
 
+const NOMINAL_LOG_TAG: &'static str = "NOMINAL";
+
 fn main() {
     esp_idf_svc::sys::link_patches();
+    EspLogger::initialize_default();
 
-    println!("Starting main application");
+    info!("Starting main application");
     unsafe { I2C_Init() };
     unsafe { QMI8658_Init() };
     unsafe { EXIO_Init() };
@@ -40,7 +47,7 @@ fn main() {
         )
     };
 
-    println!("Starting LVGL loop");
+    info!("Starting LVGL loop");
     loop {
         // raise the task priority of LVGL and/or reduce the handler period can improve the performance
         unsafe { vTaskDelay(ms_to_ticks(10)) };
@@ -71,13 +78,14 @@ extern "C" fn touch_event_callback(state: lv_indev_state_t, point: lv_point_t) {
     #[allow(non_upper_case_globals)]
     match state {
         lv_indev_state_t_LV_INDEV_STATE_RELEASED => {
-            println!("Release");
+            debug!("Release");
         }
         lv_indev_state_t_LV_INDEV_STATE_PRESSED => {
-            println!("Touch: X={} Y={}", point.x, point.y);
+            debug!("Touch");
+            info!(target: NOMINAL_LOG_TAG, "X={} Y={}", point.x, point.y);
         }
         val => {
-            println!("Unexpected touch event state: {val}");
+            warn!("Unexpected touch event state: {val}");
         }
     }
 }

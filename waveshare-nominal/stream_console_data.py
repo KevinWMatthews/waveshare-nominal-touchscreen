@@ -9,7 +9,7 @@ logger = connect_python.get_logger(__name__)
 
 
 class TouchscreenReading:
-    MODULE = "LVGL"
+    NOMINAL_LOG_TAG = "NOMINAL"
 
     timestamp: ConnectTimestamp
     x: int
@@ -32,7 +32,7 @@ class TouchscreenReading:
         time_since_boot_ms = parts[1].strip('()')
         time_since_boot_ns = int(time_since_boot_ms) * 1_000_000
         module = parts[2].rstrip(':')
-        if module == TouchscreenReading.MODULE:
+        if module == TouchscreenReading.NOMINAL_LOG_TAG:
             x = int(parts[3].lstrip('X='))
             y = int(parts[4].lstrip('Y='))
             return TouchscreenReading(time_since_boot_ns, x, y)

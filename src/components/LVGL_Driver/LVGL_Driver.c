@@ -59,7 +59,7 @@ void example_touchpad_read( lv_indev_drv_t * drv, lv_indev_data_t * data )
         data->point.x = touchpad_x[0];
         data->point.y = touchpad_y[0];
         data->state = LV_INDEV_STATE_PR;
-        ESP_LOGI(LVGL_TAG, "X=%u Y=%u", data->point.x, data->point.y);
+        ESP_LOGD(LVGL_TAG, "X=%u Y=%u", data->point.x, data->point.y);
         touch_event_ctx->prev_state = LV_INDEV_STATE_PRESSED;
         (touch_event_ctx->user_callback)(data->state, data->point);
     } else {

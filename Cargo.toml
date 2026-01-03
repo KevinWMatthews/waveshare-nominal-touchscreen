@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 esp-idf-sys = "0.36.1"
 esp-idf-svc = "0.51.0"
+log = "0.4"
 
 [[package.metadata.esp-idf-sys.extra_components]]
 component_dirs = ["src/components/Buzzer"]
