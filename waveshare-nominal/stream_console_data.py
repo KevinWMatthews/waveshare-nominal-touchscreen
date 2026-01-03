@@ -61,9 +61,9 @@ class TouchscreenReading:
 def stream_console_data(client: connect_python.Client):
     port = client.get_value('serial_device')
     if not port:
-        logger.error('No serial device selected')
-        raise Exception('No serial device selected')
-    logger.info(f'Streaming from serial device: {port}')
+        logger.error('Error: no serial device selected')
+        return
+    logger.info(f'Streaming data from serial device: {port}')
 
     start_time = datetime.now(timezone.utc)
     try:
