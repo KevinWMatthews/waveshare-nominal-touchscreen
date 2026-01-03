@@ -60,19 +60,17 @@ void example_touchpad_read( lv_indev_drv_t * drv, lv_indev_data_t * data )
         data->point.y = touchpad_y[0];
         data->state = LV_INDEV_STATE_PR;
         ESP_LOGD(LVGL_TAG, "X=%u Y=%u", data->point.x, data->point.y);
+        (touch_event_ctx->user_callback)(data->state, touch_event_ctx->prev_state, data->point);
         touch_event_ctx->prev_state = LV_INDEV_STATE_PRESSED;
-        (touch_event_ctx->user_callback)(data->state, data->point);
     } else {
         data->state = LV_INDEV_STATE_REL;
-        if (touch_event_ctx->prev_state != LV_INDEV_STATE_RELEASED) {
-            ESP_LOGD(LVGL_TAG, "Release event");
-            touch_event_ctx->prev_state = LV_INDEV_STATE_RELEASED;
-            lv_point_t point = {
-                .x = LV_COORD_MIN,
-                .y = LV_COORD_MIN,
-            };
-            (touch_event_ctx->user_callback)(data->state, point);
-        }
+        ESP_LOGD(LVGL_TAG, "Release event");
+        lv_point_t point = {
+            .x = LV_COORD_MIN,
+            .y = LV_COORD_MIN,
+        };
+        (touch_event_ctx->user_callback)(data->state, touch_event_ctx->prev_state, point);
+        touch_event_ctx->prev_state = LV_INDEV_STATE_RELEASED;
     }
 }
 void LVGL_Init(lvgl_touch_event_cb touch_event_cb)

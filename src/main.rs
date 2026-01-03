@@ -1,3 +1,4 @@
+mod hmi;
 use std::ffi::CString;
 use std::ptr;
 
@@ -20,6 +21,9 @@ use esp_idf_sys::xTaskCreatePinnedToCore;
 use log::debug;
 use log::info;
 use log::warn;
+
+use crate::hmi::draw_neutral_face;
+use crate::hmi::draw_smiling_face;
 
 const NOMINAL_LOG_TAG: &'static str = "NOMINAL";
 
@@ -48,7 +52,8 @@ fn main() {
         )
     };
 
-    info!("Starting LVGL loop");
+    info!("Drawing screen and starting LVGL loop");
+    draw_neutral_face();
     loop {
         // raise the task priority of LVGL and/or reduce the handler period can improve the performance
         unsafe { vTaskDelay(ms_to_ticks(10)) };
@@ -75,18 +80,29 @@ fn ms_to_ticks(time_in_ms: u32) -> u32 {
     (time_in_ms * esp_idf_sys::configTICK_RATE_HZ) / 1000
 }
 
-extern "C" fn touch_event_callback(state: lv_indev_state_t, point: lv_point_t) {
+pub extern "C" fn touch_event_callback(
+    state: lv_indev_state_t,
+    prev_state: lv_indev_state_t,
+    point: lv_point_t,
+) {
     #[allow(non_upper_case_globals)]
-    match state {
-        lv_indev_state_t_LV_INDEV_STATE_RELEASED => {
-            debug!("Release");
-        }
-        lv_indev_state_t_LV_INDEV_STATE_PRESSED => {
+    match (prev_state, state) {
+        (lv_indev_state_t_LV_INDEV_STATE_RELEASED, lv_indev_state_t_LV_INDEV_STATE_RELEASED) => {}
+        (lv_indev_state_t_LV_INDEV_STATE_RELEASED, lv_indev_state_t_LV_INDEV_STATE_PRESSED) => {
             debug!("Touch");
             info!(target: NOMINAL_LOG_TAG, "X={} Y={}", point.x, point.y);
+            draw_smiling_face();
+        }
+        (lv_indev_state_t_LV_INDEV_STATE_PRESSED, lv_indev_state_t_LV_INDEV_STATE_PRESSED) => {
+            // Log coordinate changes while user is touching screen
+            info!(target: NOMINAL_LOG_TAG, "X={} Y={}", point.x, point.y);
+        }
+        (lv_indev_state_t_LV_INDEV_STATE_PRESSED, lv_indev_state_t_LV_INDEV_STATE_RELEASED) => {
+            debug!("Release");
+            draw_neutral_face();
         }
         val => {
-            warn!("Unexpected touch event state: {val}");
+            warn!("Unexpected touch event state: {val:?}");
         }
     }
 }
