@@ -1,6 +1,6 @@
 idf_component_register(
     SRCS
-        "lvgl_driver.c"
+        "LVGL_Driver.c"
 
     INCLUDE_DIRS
          "."

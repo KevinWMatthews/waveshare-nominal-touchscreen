@@ -1,4 +1,4 @@
-#include "lvgl_driver.h"
+#include "LVGL_Driver.h"
 
 static const char *LVGL_TAG = "LVGL";
 lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)

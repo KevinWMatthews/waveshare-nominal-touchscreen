@@ -25,8 +25,8 @@ bindings_header = "src/components/I2C_Driver/I2C_Driver.h"
 component_dirs = ["src/components/lvgl__lvgl"]
 
 [[package.metadata.esp-idf-sys.extra_components]]
-component_dirs = ["src/components/lvgl_driver"]
-bindings_header = "src/components/lvgl_driver/lvgl_driver.h"
+component_dirs = ["src/components/LVGL_Driver"]
+bindings_header = "src/components/LVGL_Driver/LVGL_Driver.h"
 
 [[package.metadata.esp-idf-sys.extra_components]]
 component_dirs = ["src/components/QMI8658"]
