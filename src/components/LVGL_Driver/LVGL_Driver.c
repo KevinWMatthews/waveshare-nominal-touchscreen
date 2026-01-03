@@ -2,7 +2,7 @@
 
 typedef struct _TouchEventCtx {
     void *user_data;
-    void (*user_callback)(lv_indev_state_t state, lv_point_t point);
+    lvgl_touch_event_cb user_callback;
     esp_lcd_panel_handle_t driver_data;
     lv_indev_state_t prev_state;
 } TouchEventCtx;
