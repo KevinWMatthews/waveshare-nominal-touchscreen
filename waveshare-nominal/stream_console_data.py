@@ -1,3 +1,4 @@
+import re
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -26,18 +27,34 @@ class TouchscreenReading:
     @staticmethod
     def parse(data: str) -> Optional[TouchscreenReading]:
         # Sample data (with color disabled):
-        # b'I (18786) LVGL: X=259 Y=362\r\n'
-        parts = data.split(" ")
-        log_level = parts[0]
-        time_since_boot_ms = parts[1].strip('()')
-        time_since_boot_ns = int(time_since_boot_ms) * 1_000_000
-        module = parts[2].rstrip(':')
-        if module == TouchscreenReading.NOMINAL_LOG_TAG:
-            x = int(parts[3].lstrip('X='))
-            y = int(parts[4].lstrip('Y='))
-            return TouchscreenReading(time_since_boot_ns, x, y)
-        else:
+        # b'I (18786) NOMINAL: X=259 Y=362\r\n'
+        # Regex key::
+        # `^`: start anchor
+        # `$`: end anchor
+        # `()`: A capture group
+        # `\(` and `\)`: escaped parenthesis (not a capture group)
+        # `?P<name>`: A named capture group
+        # `\d+`: one or more digits
+        # `\s`: a space
+        pattern = r"^(?P<level>I)\s\((?P<timestamp>\d+)\)\s(?P<module>NOMINAL):\sX=(?P<x>\d+)\sY=(?P<y>\d+)$"
+        match = re.search(pattern, data)
+        if match is None:
             return None
+
+        module = match.group('module')
+        if module != TouchscreenReading.NOMINAL_LOG_TAG:
+            return None
+
+        log_level = match.group('level')
+        if log_level != 'I':
+            return None
+
+        time_since_boot_ms = match.group('timestamp')
+        time_since_boot_ns = int(time_since_boot_ms) * 1_000_000  # TODO Will this always match?
+
+        x = int(match.group('x'))
+        y = int(match.group('y'))
+        return TouchscreenReading(time_since_boot_ns, x, y)
 
 
 @connect_python.main
