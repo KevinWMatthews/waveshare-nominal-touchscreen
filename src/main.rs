@@ -17,6 +17,8 @@ use std::ffi::CString;
 use std::ptr;
 
 fn main() {
+    esp_idf_svc::sys::link_patches();
+
     println!("Starting main application");
     unsafe { I2C_Init() };
     unsafe { QMI8658_Init() };
