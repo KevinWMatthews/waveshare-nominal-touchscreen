@@ -1,8 +1,5 @@
 #include "QMI8658.h"
 
-IMUdata Accel;
-IMUdata Gyro;
-
 uint8_t Device_addr ; // default for SD0/SA0 low, 0x6A if high
 acc_scale_t acc_scale = ACC_RANGE_4G;
 gyro_scale_t gyro_scale = GYR_RANGE_64DPS;
@@ -58,9 +55,10 @@ void QMI8658_Init(void)
         case GYR_RANGE_1024DPS: gyroScales = 1024.0 / 32768.0; break;
     }
 }
-void QMI8658_Loop(void)
+void QMI8658_Loop(IMUdata *accel, IMUdata *gyro)
 {
-  getAccelerometer();
+    getAccelerometer(accel);
+    getGyroscope(gyro);
 }
 
 /**
@@ -260,29 +258,37 @@ void setState(sensor_state_t state)
 }
 
 
-void getAccelerometer(void)
+void getAccelerometer(IMUdata *accel)
 {
-
+    if (accel == NULL) {
+        return;
+    }
     uint8_t buf[6];
     I2C_Read(Device_addr, QMI8658_AX_L, buf, 6);
-    Accel.x = (float)((int16_t)((buf[1]<<8) | (buf[0])));
-    Accel.y = (float)((int16_t)((buf[3]<<8) | (buf[2])));
-    Accel.z = (float)((int16_t)((buf[5]<<8) | (buf[4])));
-    Accel.x = Accel.x * accelScales;
-    Accel.y = Accel.y * accelScales;
-    Accel.z = Accel.z * accelScales;
-
+    IMUdata reading = {0};
+    reading.x = (float)((int16_t)((buf[1]<<8) | (buf[0])));
+    reading.y = (float)((int16_t)((buf[3]<<8) | (buf[2])));
+    reading.z = (float)((int16_t)((buf[5]<<8) | (buf[4])));
+    reading.x = reading.x * accelScales;
+    reading.y = reading.y * accelScales;
+    reading.z = reading.z * accelScales;
+    *accel = reading;
 }
-void getGyroscope(void)
+void getGyroscope(IMUdata *gyro)
 {
+    if (gyro == NULL) {
+        return;
+    }
     uint8_t buf[6];
     I2C_Read(Device_addr, QMI8658_GX_L, buf, 6);
-    Gyro.x = (float)((int16_t)((buf[1]<<8) | (buf[0])));
-    Gyro.y = (float)((int16_t)((buf[3]<<8) | (buf[2])));
-    Gyro.z = (float)((int16_t)((buf[5]<<8) | (buf[4])));
-    Gyro.x = Gyro.x * gyroScales;
-    Gyro.y = Gyro.y * gyroScales;
-    Gyro.z = Gyro.z * gyroScales;
+    IMUdata reading = {0};
+    reading.x = (float)((int16_t)((buf[1]<<8) | (buf[0])));
+    reading.y = (float)((int16_t)((buf[3]<<8) | (buf[2])));
+    reading.z = (float)((int16_t)((buf[5]<<8) | (buf[4])));
+    reading.x = reading.x * gyroScales;
+    reading.y = reading.y * gyroScales;
+    reading.z = reading.z * gyroScales;
+    *gyro = reading;
 }
 
 

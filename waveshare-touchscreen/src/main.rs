@@ -6,6 +6,7 @@ use esp_idf_svc::log::EspLogger;
 use esp_idf_sys as _;
 use esp_idf_sys::EXIO_Init;
 use esp_idf_sys::I2C_Init;
+use esp_idf_sys::IMUdata;
 use esp_idf_sys::LCD_Init;
 use esp_idf_sys::LVGL_Init;
 use esp_idf_sys::QMI8658_Init;
@@ -25,7 +26,9 @@ use log::warn;
 use crate::hmi::draw_neutral_face;
 use crate::hmi::draw_smiling_face;
 
-const NOMINAL_LOG_TAG: &'static str = "NOMINAL";
+const ACCEL_LOG_TAG: &'static str = "NOMINAL ACCEL";
+const GYRO_LOG_TAG: &'static str = "NOMINAL GYRO";
+const TOUCH_LOG_TAG: &'static str = "NOMINAL TOUCH";
 
 fn main() {
     esp_idf_svc::sys::link_patches();
@@ -44,7 +47,7 @@ fn main() {
         xTaskCreatePinnedToCore(
             Some(driver_task),
             task_name.unwrap().as_ptr(),
-            4096,
+            4096 * 2, // TODO Tune this stack size
             ptr::null_mut(),
             3,
             ptr::null_mut(),
@@ -64,8 +67,12 @@ fn main() {
 
 extern "C" fn driver_task(_arg: *mut std::ffi::c_void) {
     loop {
-        unsafe { QMI8658_Loop() };
+        let mut accel = IMUdata::default();
+        let mut gyro = IMUdata::default();
+        unsafe { QMI8658_Loop(&mut accel, &mut gyro) };
         unsafe { vTaskDelay(ms_to_ticks(100)) };
+        info!(target: ACCEL_LOG_TAG, "X={} Y={} Z={}", accel.x, accel.y, accel.z);
+        info!(target: GYRO_LOG_TAG, "X={} Y={} Z={}", gyro.x, gyro.y, gyro.z);
     }
 }
 
@@ -90,12 +97,12 @@ pub extern "C" fn touch_event_callback(
         (lv_indev_state_t_LV_INDEV_STATE_RELEASED, lv_indev_state_t_LV_INDEV_STATE_RELEASED) => {}
         (lv_indev_state_t_LV_INDEV_STATE_RELEASED, lv_indev_state_t_LV_INDEV_STATE_PRESSED) => {
             debug!("Touch");
-            info!(target: NOMINAL_LOG_TAG, "X={} Y={}", point.x, point.y);
+            info!(target: TOUCH_LOG_TAG, "X={} Y={}", point.x, point.y);
             draw_smiling_face();
         }
         (lv_indev_state_t_LV_INDEV_STATE_PRESSED, lv_indev_state_t_LV_INDEV_STATE_PRESSED) => {
             // Log coordinate changes while user is touching screen
-            info!(target: NOMINAL_LOG_TAG, "X={} Y={}", point.x, point.y);
+            info!(target: TOUCH_LOG_TAG, "X={} Y={}", point.x, point.y);
         }
         (lv_indev_state_t_LV_INDEV_STATE_PRESSED, lv_indev_state_t_LV_INDEV_STATE_RELEASED) => {
             debug!("Release");

@@ -133,11 +133,9 @@ typedef struct __IMUdata {
     float z;
 } IMUdata;
 
-extern IMUdata Accel;
-extern IMUdata Gyro;
 
 void QMI8658_Init(void);
-void QMI8658_Loop(void);
+void QMI8658_Loop(IMUdata *accel, IMUdata *gyro);
 void QMI8658_transmit(uint8_t addr, uint8_t data);
 uint8_t QMI8658_receive(uint8_t addr);
 void QMI8658_CTRL9_Write(uint8_t command);
@@ -157,5 +155,5 @@ float getAccZ();
 float getGyroX();
 float getGyroY();
 float getGyroZ();
-void getAccelerometer(void);
-void getGyroscope(void);
+void getAccelerometer(IMUdata *accel);
+void getGyroscope(IMUdata *gyro);
