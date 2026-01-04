@@ -40,19 +40,31 @@ left_panel:
           on_click:
             id: connect
             path: stream_console_data.py
+        - input: checkbox
+          id: log_touch
+          label: Log Touch Data
+        - input: checkbox
+          id: log_accel
+          label: Log Accel Data
+        - input: checkbox
+          id: log_gyro
+          label: Log Gyro Data
+        - input: checkbox
+          id: log_console
+          label: Log Console Data
         - display: logs
           script_id: connect
 
 right_panel:
   width: 1.0
   tabs:
-    - name: Scatter Chart
+    - name: Touch Scatter Chart
       layout:
         - title: Touchscreen
           stream_id: touch
           plot: scatter
-          x_channel: x_coord
-          y_channel: y_coord
+          x_channel: x
+          y_channel: y
           x_label: X Axis
           y_label: Y Axis
           x_bounds:
@@ -63,8 +75,10 @@ right_panel:
             max: 500
           show_legend: true
           legend_placement: bottom_right
-          height: 600.0
-    - name: Line Chart
+        - title: channel table
+          display: channel_table
+          stream_id: touch
+    - name: Touch Line Chart
       layout:
         - title: Touchscreen
           stream_id: touch
@@ -75,15 +89,136 @@ right_panel:
           y_bounds:
             min: 0
             max: 500
+          colors: [ "green", "yellow" ]
+          show_picker: true
           show_legend: true
           legend_placement: bottom_right
         - title: X Coord
           display: stream_value
           stream_id: touch
-          channel: x_coord
-          color: rgb(0,0,255)
+          channel: x
+          color: "green"
         - title: Y Coord
           display: stream_value
           stream_id: touch
-          channel: y_coord
-          color: rgb(0,255,0)
+          channel: y
+          color: "yellow"
+    - name: Accel Scatter Chart
+      layout:
+        - title: Accelerometer
+          stream_id: accel
+          plot: scatter
+          x_channel: x
+          y_channel: y
+          z_channel: z
+          x_label: X Axis
+          y_label: Y Axis
+          z_label: Z Axis
+          # NOTE: Typical accelerometer data ranges from -1.0 to +1.0,
+          # but can vary much more widely with a hard shake.
+          x_bounds:
+            min: -1.0
+            max: 1.0
+          y_bounds:
+            min: -1.0
+            max: 1.0
+          z_bounds:
+            min: -1.0
+            max: 1.0
+          show_legend: true
+          legend_placement: bottom_right
+        - title: channel table
+          display: channel_table
+          stream_id: accel
+    - name: Accel Line Chart
+      layout:
+        - title: Accelerometer
+          id: tst
+          stream_id: accel
+          channels: [ "x", "y", "z" ]
+          plot: line
+          x_label: Time
+          x_format: timestamp
+          y_label: IMU?
+          # NOTE: Typical accelerometer data ranges from -1.0 to +1.0,
+          # but can vary much more widely with a hard shake.
+          # Allow the axes to be adjusted by the user?
+          y_bounds:
+            min: -3.0
+            max: 3.0
+          colors: [ "green", "yellow", "purple" ]
+          show_picker: true
+          show_legend: true
+          legend_placement: bottom_right
+        - title: X
+          display: stream_value
+          stream_id: accel
+          channel: x
+          color: "green"
+        - title: Y
+          display: stream_value
+          stream_id: accel
+          channel: y
+          color: "yellow"
+        - title: Z
+          display: stream_value
+          stream_id: accel
+          channel: z
+          color: "purple"
+    - name: Gyro Scatter Chart
+      layout:
+        - title: Gyroscope
+          stream_id: gyro
+          plot: scatter
+          x_channel: x
+          y_channel: y
+          z_channel: z
+          x_label: X Axis
+          y_label: Y Axis
+          z_label: Z Axis
+          x_bounds:
+            min: -10.0
+            max: 10.0
+          y_bounds:
+            min: -10.0
+            max: 10.0
+          z_bounds:
+            min: -10.0
+            max: 10.0
+          show_legend: true
+          legend_placement: bottom_right
+        - title: channel table
+          display: channel_table
+          stream_id: gyro
+    - name: Gyro Line Chart
+      layout:
+        - title: Gyroscope
+          id: tst
+          stream_id: gyro
+          channels: [ "x", "y", "z" ]
+          plot: line
+          x_label: Time
+          x_format: timestamp
+          y_label: IMU?
+          y_bounds:
+            min: -10.0
+            max: 10.0
+          colors: [ "green", "yellow", "purple" ]
+          show_picker: true
+          show_legend: true
+          legend_placement: bottom_right
+        - title: X
+          display: stream_value
+          stream_id: gyro
+          channel: x
+          color: "green"
+        - title: Y
+          display: stream_value
+          stream_id: gyro
+          channel: y
+          color: "yellow"
+        - title: Z
+          display: stream_value
+          stream_id: gyro
+          channel: z
+          color: "purple"
