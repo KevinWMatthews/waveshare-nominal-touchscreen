@@ -1,8 +1,8 @@
 #include "LVGL_Driver.h"
 
 typedef struct _TouchEventCtx {
-    void *user_data;
     lvgl_touch_event_cb user_callback;
+    void *user_data;
     esp_lcd_panel_handle_t driver_data;
     lv_indev_state_t prev_state;
 } TouchEventCtx;
@@ -60,7 +60,7 @@ void example_touchpad_read( lv_indev_drv_t * drv, lv_indev_data_t * data )
         data->point.y = touchpad_y[0];
         data->state = LV_INDEV_STATE_PR;
         ESP_LOGD(LVGL_TAG, "X=%u Y=%u", data->point.x, data->point.y);
-        (touch_event_ctx->user_callback)(data->state, touch_event_ctx->prev_state, data->point);
+        (touch_event_ctx->user_callback)(data->state, touch_event_ctx->prev_state, data->point, touch_event_ctx->user_data);
         touch_event_ctx->prev_state = LV_INDEV_STATE_PRESSED;
     } else {
         data->state = LV_INDEV_STATE_REL;
@@ -69,11 +69,11 @@ void example_touchpad_read( lv_indev_drv_t * drv, lv_indev_data_t * data )
             .x = LV_COORD_MIN,
             .y = LV_COORD_MIN,
         };
-        (touch_event_ctx->user_callback)(data->state, touch_event_ctx->prev_state, point);
+        (touch_event_ctx->user_callback)(data->state, touch_event_ctx->prev_state, point, touch_event_ctx->user_data);
         touch_event_ctx->prev_state = LV_INDEV_STATE_RELEASED;
     }
 }
-void LVGL_Init(lvgl_touch_event_cb touch_event_cb)
+void LVGL_Init(lvgl_touch_event_cb touch_event_cb, void *user_data)
 {
     ESP_LOGI(LVGL_TAG, "Initialize LVGL library");
     lv_init();
@@ -117,6 +117,7 @@ void LVGL_Init(lvgl_touch_event_cb touch_event_cb)
     touch_event_ctx->user_callback = touch_event_cb;
     touch_event_ctx->driver_data = tp;
     touch_event_ctx->prev_state = LV_INDEV_STATE_RELEASED;
+    touch_event_ctx->user_data = user_data;
     lv_indev_drv_init ( &indev_drv );
     indev_drv.type = LV_INDEV_TYPE_POINTER;
     indev_drv.disp = disp;

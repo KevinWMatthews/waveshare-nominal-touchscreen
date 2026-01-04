@@ -63,9 +63,14 @@ fn main() {
     unsafe { EXIO_Init() };
     unsafe { LCD_Init(ptr::null_mut()) };
     unsafe { Touch_Init() };
-    unsafe { LVGL_Init(Some(touch_event_callback)) };
 
     let (log_tx, log_rx) = std::sync::mpsc::channel::<NominalDataPoint>();
+    // NOTE: This Box is leaked so that it can be used by the LVGL touch event callback.
+    // LVGL isn't currently torn down, so this resource is never deallocated.
+    let lvgl_log_tx = Box::leak(Box::new(log_tx.clone()));
+    let ptr = lvgl_log_tx as *mut Sender<NominalDataPoint> as *mut c_void;
+    unsafe { LVGL_Init(Some(touch_event_callback), ptr) };
+
     std::thread::Builder::new()
         .stack_size(4096 * 3) // TODO tune stack size
         .spawn(move || {
@@ -75,7 +80,9 @@ fn main() {
                     Ok(msg) => {
                         debug!("Log channel RX: {msg:?}");
                         match msg {
-                            NominalDataPoint::Touch(_) => {}
+                            NominalDataPoint::Touch(point) => {
+                                info!(target: TOUCH_LOG_TAG, "X={} Y={}", point.x, point.y);
+                            }
                             NominalDataPoint::Accel(accel) => {
                                 info!(target: ACCEL_LOG_TAG, "X={} Y={} Z={}", accel.x, accel.y, accel.z);
                             }
@@ -145,18 +152,20 @@ pub extern "C" fn touch_event_callback(
     state: lv_indev_state_t,
     prev_state: lv_indev_state_t,
     point: lv_point_t,
+    user_data: *mut c_void,
 ) {
+    let log_tx = &mut unsafe { (*(user_data as *mut Sender<NominalDataPoint>)).clone() };
     #[allow(non_upper_case_globals)]
     match (prev_state, state) {
         (lv_indev_state_t_LV_INDEV_STATE_RELEASED, lv_indev_state_t_LV_INDEV_STATE_RELEASED) => {}
         (lv_indev_state_t_LV_INDEV_STATE_RELEASED, lv_indev_state_t_LV_INDEV_STATE_PRESSED) => {
             debug!("Touch");
-            info!(target: TOUCH_LOG_TAG, "X={} Y={}", point.x, point.y);
+            let _ = log_tx.send(NominalDataPoint::touch_point_from(point));
             draw_smiling_face();
         }
         (lv_indev_state_t_LV_INDEV_STATE_PRESSED, lv_indev_state_t_LV_INDEV_STATE_PRESSED) => {
             // Log coordinate changes while user is touching screen
-            info!(target: TOUCH_LOG_TAG, "X={} Y={}", point.x, point.y);
+            let _ = log_tx.send(NominalDataPoint::touch_point_from(point));
         }
         (lv_indev_state_t_LV_INDEV_STATE_PRESSED, lv_indev_state_t_LV_INDEV_STATE_RELEASED) => {
             debug!("Release");
