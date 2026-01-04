@@ -13,14 +13,16 @@ use esp_idf_sys::LCD_Init;
 use esp_idf_sys::LVGL_Init;
 use esp_idf_sys::QMI8658_Init;
 use esp_idf_sys::QMI8658_Loop;
+use esp_idf_sys::TickType_t;
 use esp_idf_sys::Touch_Init;
 use esp_idf_sys::lv_indev_state_t;
 use esp_idf_sys::lv_indev_state_t_LV_INDEV_STATE_PRESSED;
 use esp_idf_sys::lv_indev_state_t_LV_INDEV_STATE_RELEASED;
 use esp_idf_sys::lv_point_t;
 use esp_idf_sys::lv_timer_handler;
-use esp_idf_sys::vTaskDelay;
 use esp_idf_sys::xTaskCreatePinnedToCore;
+use esp_idf_sys::xTaskDelayUntil;
+use esp_idf_sys::xTaskGetTickCount;
 use log::debug;
 use log::info;
 use log::warn;
@@ -116,9 +118,13 @@ fn main() {
 
     info!("Drawing screen and starting LVGL loop");
     draw_neutral_face();
+
+    let frequency = ms_to_ticks(10);
+    let mut last_wake = unsafe { xTaskGetTickCount() };
     loop {
+        // TODO Try using the unstable Rust feature thread_sleep_until and thread::sleep_until()
         // raise the task priority of LVGL and/or reduce the handler period can improve the performance
-        unsafe { vTaskDelay(ms_to_ticks(10)) };
+        let _was_delayed = unsafe { xTaskDelayUntil(&mut last_wake as *mut TickType_t, frequency) };
         // The task running lv_timer_handler should have lower priority than that running `lv_tick_inc`
         unsafe { lv_timer_handler() };
     }
@@ -127,13 +133,15 @@ fn main() {
 extern "C" fn driver_task(arg: *mut std::ffi::c_void) {
     let ptr = arg as *mut Sender<NominalDataPoint>;
     let log_tx = unsafe { Box::from_raw(ptr) };
+    let frequency = ms_to_ticks(100);
+    let mut last_wake = unsafe { xTaskGetTickCount() };
     loop {
         let mut accel = IMUdata::default();
         let mut gyro = IMUdata::default();
         unsafe { QMI8658_Loop(&mut accel, &mut gyro) };
         let _ = log_tx.send(NominalDataPoint::accel_point_from(accel));
         let _ = log_tx.send(NominalDataPoint::gyro_point_from(gyro));
-        unsafe { vTaskDelay(ms_to_ticks(100)) };
+        let _was_delayed = unsafe { xTaskDelayUntil(&mut last_wake as *mut TickType_t, frequency) };
     }
 }
 
