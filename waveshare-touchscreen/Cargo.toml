@@ -1,0 +1,45 @@
+[package]
+name = "waveshare-touchscreen"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
+esp-idf-sys.workspace = true
+esp-idf-svc.workspace = true
+log.workspace = true
+
+[[package.metadata.esp-idf-sys.extra_components]]
+component_dirs = ["src/components/Buzzer"]
+
+[[package.metadata.esp-idf-sys.extra_components]]
+component_dirs = ["src/components/EXIO"]
+bindings_header = "src/components/EXIO/EXIO.h"
+
+[[package.metadata.esp-idf-sys.extra_components]]
+component_dirs = ["src/components/LCD_Driver"]
+bindings_header = "src/components/LCD_Driver/ST7701S.h"
+
+[[package.metadata.esp-idf-sys.extra_components]]
+component_dirs = ["src/components/I2C_Driver"]
+bindings_header = "src/components/I2C_Driver/I2C_Driver.h"
+
+[[package.metadata.esp-idf-sys.extra_components]]
+component_dirs = ["src/components/lvgl__lvgl"]
+
+[[package.metadata.esp-idf-sys.extra_components]]
+component_dirs = ["src/components/LVGL_Driver"]
+bindings_header = "src/components/LVGL_Driver/LVGL_Driver.h"
+
+[[package.metadata.esp-idf-sys.extra_components]]
+component_dirs = ["src/components/QMI8658"]
+bindings_header = "src/components/QMI8658/QMI8658.h"
+
+[[package.metadata.esp-idf-sys.extra_components]]
+component_dirs = ["src/components/TCA9554PWR"]
+
+[[package.metadata.esp-idf-sys.extra_components]]
+component_dirs = ["src/components/Touch_Driver"]
+bindings_header = "src/components/Touch_Driver/GT911.h"
+
+[build-dependencies]
+embuild.workspace = true

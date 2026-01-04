@@ -1,45 +1,14 @@
-[package]
-name = "waveshare-touchscreen"
-version = "0.1.0"
+[workspace]
+members = [
+    "waveshare-touchscreen"
+]
+resolver = "3"
+
+[workspace.package]
 edition = "2024"
 
-[dependencies]
+[workspace.dependencies]
+embuild = { version = "0.33.1", features = ["espidf"] }
 esp-idf-sys = "0.36.1"
 esp-idf-svc = "0.51.0"
 log = "0.4"
-
-[[package.metadata.esp-idf-sys.extra_components]]
-component_dirs = ["src/components/Buzzer"]
-
-[[package.metadata.esp-idf-sys.extra_components]]
-component_dirs = ["src/components/EXIO"]
-bindings_header = "src/components/EXIO/EXIO.h"
-
-[[package.metadata.esp-idf-sys.extra_components]]
-component_dirs = ["src/components/LCD_Driver"]
-bindings_header = "src/components/LCD_Driver/ST7701S.h"
-
-[[package.metadata.esp-idf-sys.extra_components]]
-component_dirs = ["src/components/I2C_Driver"]
-bindings_header = "src/components/I2C_Driver/I2C_Driver.h"
-
-[[package.metadata.esp-idf-sys.extra_components]]
-component_dirs = ["src/components/lvgl__lvgl"]
-
-[[package.metadata.esp-idf-sys.extra_components]]
-component_dirs = ["src/components/LVGL_Driver"]
-bindings_header = "src/components/LVGL_Driver/LVGL_Driver.h"
-
-[[package.metadata.esp-idf-sys.extra_components]]
-component_dirs = ["src/components/QMI8658"]
-bindings_header = "src/components/QMI8658/QMI8658.h"
-
-[[package.metadata.esp-idf-sys.extra_components]]
-component_dirs = ["src/components/TCA9554PWR"]
-
-[[package.metadata.esp-idf-sys.extra_components]]
-component_dirs = ["src/components/Touch_Driver"]
-bindings_header = "src/components/Touch_Driver/GT911.h"
-
-[build-dependencies]
-embuild = { version = "0.33.1", features = ["espidf"] }
