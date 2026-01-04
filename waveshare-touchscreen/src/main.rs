@@ -1,6 +1,8 @@
 mod hmi;
 use std::ffi::CString;
+use std::ffi::c_void;
 use std::ptr;
+use std::sync::mpsc::Sender;
 
 use esp_idf_svc::log::EspLogger;
 use esp_idf_sys as _;
@@ -30,6 +32,27 @@ const ACCEL_LOG_TAG: &'static str = "NOMINAL ACCEL";
 const GYRO_LOG_TAG: &'static str = "NOMINAL GYRO";
 const TOUCH_LOG_TAG: &'static str = "NOMINAL TOUCH";
 
+#[derive(Clone, Debug)]
+enum NominalDataPoint {
+    Touch(lv_point_t),
+    Accel(IMUdata),
+    Gyro(IMUdata),
+}
+
+impl NominalDataPoint {
+    fn touch_point_from(data: lv_point_t) -> Self {
+        NominalDataPoint::Touch(data)
+    }
+
+    fn accel_point_from(data: IMUdata) -> Self {
+        NominalDataPoint::Accel(data)
+    }
+
+    fn gyro_point_from(data: IMUdata) -> Self {
+        NominalDataPoint::Gyro(data)
+    }
+}
+
 fn main() {
     esp_idf_svc::sys::link_patches();
     EspLogger::initialize_default();
@@ -42,13 +65,42 @@ fn main() {
     unsafe { Touch_Init() };
     unsafe { LVGL_Init(Some(touch_event_callback)) };
 
+    let (log_tx, log_rx) = std::sync::mpsc::channel::<NominalDataPoint>();
+    std::thread::Builder::new()
+        .stack_size(4096 * 3) // TODO tune stack size
+        .spawn(move || {
+            loop {
+                // NOTE: Blocking receive call
+                match log_rx.recv() {
+                    Ok(msg) => {
+                        debug!("Log channel RX: {msg:?}");
+                        match msg {
+                            NominalDataPoint::Touch(_) => {}
+                            NominalDataPoint::Accel(accel) => {
+                                info!(target: ACCEL_LOG_TAG, "X={} Y={} Z={}", accel.x, accel.y, accel.z);
+                            }
+                            NominalDataPoint::Gyro(gyro) => {
+                                info!(target: GYRO_LOG_TAG, "X={} Y={} Z={}", gyro.x, gyro.y, gyro.z);
+                            }
+                        }
+                    }
+                    Err(_err) => {
+                        warn!("Log channel closed");
+                        return;
+                    }
+                }
+            }
+        })
+        .expect("Spawning log thread");
+
+    let driver_log_tx = Box::into_raw(Box::new(log_tx.clone()));
     let task_name = CString::new("Driver task");
     unsafe {
         xTaskCreatePinnedToCore(
             Some(driver_task),
             task_name.unwrap().as_ptr(),
             4096 * 2, // TODO Tune this stack size
-            ptr::null_mut(),
+            driver_log_tx as *mut c_void,
             3,
             ptr::null_mut(),
             0,
@@ -65,14 +117,16 @@ fn main() {
     }
 }
 
-extern "C" fn driver_task(_arg: *mut std::ffi::c_void) {
+extern "C" fn driver_task(arg: *mut std::ffi::c_void) {
+    let ptr = arg as *mut Sender<NominalDataPoint>;
+    let log_tx = unsafe { Box::from_raw(ptr) };
     loop {
         let mut accel = IMUdata::default();
         let mut gyro = IMUdata::default();
         unsafe { QMI8658_Loop(&mut accel, &mut gyro) };
+        let _ = log_tx.send(NominalDataPoint::accel_point_from(accel));
+        let _ = log_tx.send(NominalDataPoint::gyro_point_from(gyro));
         unsafe { vTaskDelay(ms_to_ticks(100)) };
-        info!(target: ACCEL_LOG_TAG, "X={} Y={} Z={}", accel.x, accel.y, accel.z);
-        info!(target: GYRO_LOG_TAG, "X={} Y={} Z={}", gyro.x, gyro.y, gyro.z);
     }
 }
 
