@@ -75,7 +75,6 @@ extern SemaphoreHandle_t sem_gui_ready;
 
 
 extern esp_lcd_panel_handle_t panel_handle;
-extern uint8_t LCD_Backlight;
 
 typedef struct{
     char method_select;
@@ -103,9 +102,10 @@ esp_err_t ST7701S_reset(void);// LCD Reset
  *
  * user_data: Handle to user data for RGB LCD callback events.
  * The caller must ensure that the data remains valid for the lifetime of the LCD panel.
+ * backlight_brightness: Initial backlight brightness (0-100)
  */
-void LCD_Init(void *user_data);
+void LCD_Init(void *user_data, uint8_t backlight_brightness);
 
 /********************* BackLight *********************/
-void Backlight_Init(void);
+void Backlight_Init(uint8_t backlight_brightness);
 void Set_Backlight(uint8_t Light);

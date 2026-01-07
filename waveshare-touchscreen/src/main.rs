@@ -13,6 +13,7 @@ use esp_idf_sys::LCD_Init;
 use esp_idf_sys::LVGL_Init;
 use esp_idf_sys::QMI8658_Init;
 use esp_idf_sys::QMI8658_Loop;
+use esp_idf_sys::Set_Backlight;
 use esp_idf_sys::TickType_t;
 use esp_idf_sys::Touch_Init;
 use esp_idf_sys::lv_indev_state_t;
@@ -57,6 +58,9 @@ impl NominalDataPoint {
 }
 
 fn main() {
+    const BACKLIGHT_BRIGHTNESS_INITIAL: u8 = 0;
+    const BACKLIGHT_BRIGHTNESS_RUNTIME: u8 = 100;
+
     esp_idf_svc::sys::link_patches();
     EspLogger::initialize_default();
 
@@ -64,7 +68,7 @@ fn main() {
     unsafe { I2C_Init() };
     unsafe { QMI8658_Init() };
     unsafe { EXIO_Init() };
-    unsafe { LCD_Init(ptr::null_mut()) };
+    unsafe { LCD_Init(ptr::null_mut(), BACKLIGHT_BRIGHTNESS_INITIAL) };
     unsafe { Touch_Init() };
 
     let (log_tx, log_rx) = std::sync::mpsc::channel::<NominalDataPoint>();
@@ -120,6 +124,7 @@ fn main() {
     info!("Drawing screen and starting LVGL loop");
     draw_blank_screen();
     draw_neutral_face();
+    unsafe { Set_Backlight(BACKLIGHT_BRIGHTNESS_RUNTIME) };
 
     let frequency = ms_to_ticks(10);
     let mut last_wake = unsafe { xTaskGetTickCount() };

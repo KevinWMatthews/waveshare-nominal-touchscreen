@@ -417,7 +417,7 @@ static bool example_on_vsync_event(esp_lcd_panel_handle_t panel, const esp_lcd_r
 }
 
 esp_lcd_panel_handle_t panel_handle = NULL;
-void LCD_Init(void *user_data)
+void LCD_Init(void *user_data, uint8_t backlight_brightness)
 {
     /********************* LCD *********************/
     ST7701S_reset();
@@ -493,15 +493,14 @@ void LCD_Init(void *user_data)
     ESP_ERROR_CHECK(esp_lcd_panel_reset(panel_handle));
     ESP_ERROR_CHECK(esp_lcd_panel_init(panel_handle));
     ST7701S_CS_Dis();
-    Backlight_Init();
+    Backlight_Init(backlight_brightness);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Backlight program
 
-uint8_t LCD_Backlight = 70;
 static ledc_channel_config_t ledc_channel;
-void Backlight_Init(void)
+void Backlight_Init(uint8_t backlight_brightness)
 {
     ESP_LOGI(LCD_TAG, "Turn off LCD backlight");
     gpio_config_t bk_gpio_config = {
@@ -527,7 +526,7 @@ void Backlight_Init(void)
     ledc_channel_config(&ledc_channel);
     ledc_fade_func_install(0);
     
-    Set_Backlight(LCD_Backlight);      //0~100    
+    Set_Backlight(backlight_brightness);
 }
 void Set_Backlight(uint8_t Light)
 {   
