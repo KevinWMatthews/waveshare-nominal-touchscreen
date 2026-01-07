@@ -20,6 +20,7 @@ use esp_idf_sys::lv_obj_remove_style;
 use esp_idf_sys::lv_obj_set_size;
 use esp_idf_sys::lv_obj_set_style_arc_color;
 use esp_idf_sys::lv_obj_set_style_arc_width;
+use esp_idf_sys::lv_obj_set_style_bg_color;
 use esp_idf_sys::lv_obj_set_style_line_color;
 use esp_idf_sys::lv_obj_set_style_line_rounded;
 use esp_idf_sys::lv_obj_set_style_line_width;
@@ -30,11 +31,20 @@ use esp_idf_sys::lv_obj_set_style_pad_top;
 use esp_idf_sys::lv_obj_t;
 use esp_idf_sys::lv_palette_main;
 use esp_idf_sys::lv_palette_t_LV_PALETTE_BLUE;
+use esp_idf_sys::lv_palette_t_LV_PALETTE_NONE;
 use esp_idf_sys::lv_part_t;
 use esp_idf_sys::lv_point_t;
 
 const MOUTH_LINE_POINTS: [lv_point_t; 2] = [lv_point_t { x: 0, y: 0 }, lv_point_t { x: 100, y: 0 }];
 const EYE_POINTS: [lv_point_t; 2] = [lv_point_t { x: 0, y: 0 }, lv_point_t { x: 50, y: 0 }];
+
+pub fn draw_blank_screen() {
+    unsafe { lv_obj_clean(lv_scr_act()) };
+
+    let screen = unsafe { lv_scr_act() };
+    let color = unsafe { lv_palette_main(lv_palette_t_LV_PALETTE_NONE) };
+    unsafe { lv_obj_set_style_bg_color(screen, color, 0) };
+}
 
 pub fn draw_neutral_face() {
     unsafe { lv_obj_clean(lv_scr_act()) };

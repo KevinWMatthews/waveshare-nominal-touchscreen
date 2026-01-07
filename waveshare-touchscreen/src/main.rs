@@ -27,6 +27,7 @@ use log::debug;
 use log::info;
 use log::warn;
 
+use crate::hmi::draw_blank_screen;
 use crate::hmi::draw_neutral_face;
 use crate::hmi::draw_smiling_face;
 
@@ -117,6 +118,7 @@ fn main() {
     };
 
     info!("Drawing screen and starting LVGL loop");
+    draw_blank_screen();
     draw_neutral_face();
 
     let frequency = ms_to_ticks(10);
